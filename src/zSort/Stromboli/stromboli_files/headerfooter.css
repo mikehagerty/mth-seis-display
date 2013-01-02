@@ -1,0 +1,303 @@
+.headersubject {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headersubject A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headersubject A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headersubject A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headereduceth {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headereduceth A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headereduceth A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headereduceth A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerabout {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerabout A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerabout A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerabout A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headertitle A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headertitle A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headertitle A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerlanguage {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerlanguage A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerlanguage A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerlanguage A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerinfo {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerinfo A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerinfo A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headerinfo A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.footer {
+	FONT-FAMILY: Arial,sans-serif
+}
+.footer A {
+	FONT-FAMILY: Arial,sans-serif
+}
+.footer A:link {
+	FONT-FAMILY: Arial,sans-serif
+}
+.footer A:visited {
+	FONT-FAMILY: Arial,sans-serif
+}
+.headersubject {
+	FONT-WEIGHT: bold; FONT-SIZE: 1.1em
+}
+.headersubject A {
+	FONT-WEIGHT: bold; FONT-SIZE: 1.1em
+}
+.headersubject A:link {
+	FONT-WEIGHT: bold; FONT-SIZE: 1.1em
+}
+.headersubject A:visited {
+	FONT-WEIGHT: bold; FONT-SIZE: 1.1em
+}
+.headereduceth {
+	FONT-WEIGHT: bold; FONT-SIZE: 1em; COLOR: #000000
+}
+.headereduceth A {
+	FONT-WEIGHT: bold; FONT-SIZE: 1em; COLOR: #000000
+}
+.headereduceth A:link {
+	FONT-WEIGHT: bold; FONT-SIZE: 1em; COLOR: #000000
+}
+.headereduceth A:visited {
+	FONT-WEIGHT: bold; FONT-SIZE: 1em; COLOR: #000000
+}
+.headertitle {
+	FONT-WEIGHT: bolder; FONT-SIZE: 1.2em; COLOR: #ffffff
+}
+.headertitle DIV {
+	FONT-WEIGHT: bolder; FONT-SIZE: 1.2em; COLOR: #ffffff
+}
+.headertitle A {
+	FONT-WEIGHT: bolder; FONT-SIZE: 1.2em; COLOR: #ffffff
+}
+.headertitle A:link {
+	FONT-WEIGHT: bolder; FONT-SIZE: 1.2em; COLOR: #ffffff
+}
+.headertitle A:visited {
+	FONT-WEIGHT: bolder; FONT-SIZE: 1.2em; COLOR: #ffffff
+}
+.headerabout {
+	FONT-SIZE: 0.9em
+}
+.headerabout A {
+	FONT-SIZE: 0.9em
+}
+.headerabout A:link {
+	FONT-SIZE: 0.9em
+}
+.headerabout A:visited {
+	FONT-SIZE: 0.9em
+}
+.headerlanguage {
+	FONT-SIZE: 0.9em
+}
+.headerlanguage A {
+	FONT-SIZE: 0.9em
+}
+.headerlanguage A:link {
+	FONT-SIZE: 0.9em
+}
+.headerlanguage A:visited {
+	FONT-SIZE: 0.9em
+}
+.headerinfo {
+	FONT-SIZE: 0.9em
+}
+.headerinfo A {
+	FONT-SIZE: 0.9em
+}
+.headerinfo A:link {
+	FONT-SIZE: 0.9em
+}
+.headerinfo A:visited {
+	FONT-SIZE: 0.9em
+}
+.footer {
+	FONT-SIZE: 0.9em
+}
+.footer A {
+	FONT-SIZE: 0.9em
+}
+.footer A:link {
+	FONT-SIZE: 0.9em
+}
+.footer A:visited {
+	FONT-SIZE: 0.9em
+}
+.headerabout A {
+	COLOR: #000000
+}
+.headerabout A:link {
+	COLOR: #000000
+}
+.headerabout A:visited {
+	COLOR: #000000
+}
+.headertitle A {
+	COLOR: #ffffff
+}
+.headertitle A:link {
+	COLOR: #ffffff
+}
+.headertitle A:visited {
+	COLOR: #ffffff
+}
+.headerlanguage A {
+	COLOR: #ffffff
+}
+.headerlanguage A:link {
+	COLOR: #ffffff
+}
+.headerlanguage A:visited {
+	COLOR: #ffffff
+}
+.headerinfo {
+	COLOR: #ffffff
+}
+.headerinfo A {
+	COLOR: #ffffff
+}
+.headerinfo A:link {
+	COLOR: #ffffff
+}
+.headerinfo A:visited {
+	COLOR: #ffffff
+}
+.footer {
+	COLOR: #ffffff
+}
+.footer A {
+	COLOR: #ffffff
+}
+.footer A:link {
+	COLOR: #ffffff
+}
+.footer A:visited {
+	COLOR: #ffffff
+}
+.headersubject A {
+	TEXT-DECORATION: none
+}
+.headersubject A:link {
+	TEXT-DECORATION: none
+}
+.headersubject A:visited {
+	TEXT-DECORATION: none
+}
+.headereduceth A {
+	TEXT-DECORATION: none
+}
+.headereduceth A:link {
+	TEXT-DECORATION: none
+}
+.headereduceth A:visited {
+	TEXT-DECORATION: none
+}
+.headerabout A {
+	TEXT-DECORATION: none
+}
+.headerabout A:link {
+	TEXT-DECORATION: none
+}
+.headerabout A:visited {
+	TEXT-DECORATION: none
+}
+.headertitle A {
+	TEXT-DECORATION: none
+}
+.headertitle A:link {
+	TEXT-DECORATION: none
+}
+.headertitle A:visited {
+	TEXT-DECORATION: none
+}
+.headerlanguage A {
+	TEXT-DECORATION: none
+}
+.headerlanguage A:link {
+	TEXT-DECORATION: none
+}
+.headerlanguage A:visited {
+	TEXT-DECORATION: none
+}
+.headerinfo A {
+	TEXT-DECORATION: none
+}
+.headerinfo A:link {
+	TEXT-DECORATION: none
+}
+.headerinfo A:visited {
+	TEXT-DECORATION: none
+}
+.footer A {
+	TEXT-DECORATION: none
+}
+.footer A:link {
+	TEXT-DECORATION: none
+}
+.footer A:visited {
+	TEXT-DECORATION: none
+}
+.headersubject A:hover {
+	TEXT-DECORATION: underline
+}
+.headereduceth A:hover {
+	TEXT-DECORATION: underline
+}
+.headerabout A:hover {
+	TEXT-DECORATION: underline
+}
+.headertitle A:hover {
+	TEXT-DECORATION: underline
+}
+.headerlanguage A:hover {
+	TEXT-DECORATION: underline
+}
+.headerinfo A:hover {
+	TEXT-DECORATION: underline
+}
+.footer A:hover {
+	TEXT-DECORATION: underline
+}

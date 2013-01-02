@@ -1,0 +1,78 @@
+i. I believe ... that if you put main() in a package (other than default), then you *must* execute it using:
+   > java com.zzz.project.mainClassFile  
+   - where java looks for mainClassFile in $CLASS_BASE_DIR/com/zzz/project/mainClassFile.class
+
+ii.This assumes that when you compiled mainClassFile.java you did something like:
+   > javac -d $CLASS_BASE_DIR -cp path_to_any_classes_needed_by_main $SOURCE_BASE_DIR/../mainClassFile.java
+
+   and where mainClassFile.java contains the line:  package com.zz.project;
+
+
+
+javac -d bin -sourcepath src/jfreechart/source -classpath src/jfreechart/lib/jcommon-1.0.17.jar src/jFreeDemos/CombinedXYPlotDemo1.java
+
+
+-d - Tell Java where to put/find the classes.  e.g., 
+        >javac -d bin ... will put the .class files in ./bin/package_name/*.class
+
+-cp - Use to tell java where to find the base directory of any packages needed, e.g.,
+        >java -cp .;./bin someMain.java that uses classes in ./bin/package_name
+** Note that we needed to include the current dir "." in the classpath.
+** If you don't set the cp then it defaults to current dir, but if you set it, then it
+   does NOT include current dir by default.
+
+*** -cp path = path to the **base** of the package name
+
+1. Say you have a main program called TestCircle.java located in d:\myOtherProject\TestCircle.java
+   And it accesses a class Circle.java located in d:\myJavaProject\src\com\yyy\Circle.java
+
+   Where: Circle.java is contained in package = com.yyy
+     and: You want the class files (e.g., Circle.class) to locate in d:\myJavaProject\classes\
+
+// Using absolute paths (so that we can run this from ANYWHERE):
+   >javac -d  d:\myJavaProject\classes d:\myJavaProject\src\com\yyy\Circle.java
+   >javac -cp d:\myJavaProject\classes d:\myOtherProject\TestCircle.java
+   >java  -cp .;d:\myJavaProject\classes d:\myOtherProject\TestCircle
+
+2. Suppose TestCircle.java is part of package com.abc and located in d:\myOtherProject\src\com\abc\TestCircle.java
+   And we want the compiled clas to locate to:  c:\myOtherproject\classes\com\abc\TestCircle.class
+  
+   Then, we could do:
+   >javac -d  d:\myJavaProject\classes d:\myJavaProject\src\com\yyy\Circle.java - Same as before to make Circle.class
+   >javac -d d:\myOtherProject\classes -cp d:\myJavaProject\classes d:\myOtherProject\src\com\abc\TestCircle.java
+                                          classpath to Circle.class      src path to main TestCircle.java
+
+   >java  -cp d:\myOtherProject\classes;d:\myJavaProject\classes com.abc.TestCircle
+              path to all classes                              **fully-qualified package name !!
+
+-or-, if we cd to d:\myOtherProject, can run via:
+   >java  -cp classes;d:\myJavaProject\classes com.abc.TestCircle
+
+
+2. Run everything from top project directory (above src):
+
+-classpath  = Path to find .class directories and/or .jar FILES
+-sourcepath = Path to find .java files that need to be compiled
+
+>javac -d bin -classpath jfreechart-1.0.14/lib/jfreechart-1.0.14.jar:jfreechart-1.0.14/lib/jcommon-1.0.17.jar src/jFreeDemos/CombinedXYPlotDemo1.java
+
+>java -classpath jfreechart-1.0.14/lib/jfreechart-1.0.14.jar:jfreechart-1.0.14/lib/jcommon-1.0.17.jar:./bin CombinedXYPlotDemo1
+
+This works!
+
+>java -cp "libs/*":./bin CombinedXYPlotDemo1     // Also works
+>java -cp 'libs/*':./bin CombinedXYPlotDemo1     // Also works
+>java -cp  bin:'libs/*' CombinedXYPlotDemo1      // Also works
+
+If CombinedXYPlotDemo1 was part of a package, the .class file would
+ be placed in bin/--package_name--/CombinedXYPlotDemo1.class
+
+package org.jfree.chart.demo;  // This doesn't need to exist --> it will make subdirs beneath ./bin
+>java -cp  bin:'libs/*' org.jfree.chart.demo.CombinedXYPlotDemo1    ** Works
+>java -cp bin/org/jfree/chart/demo/:'libs/*' CombinedXYPlotDemo1    ** Fails:
+Exception in thread "main" java.lang.NoClassDefFoundError: CombinedXYPlotDemo1 (wrong name: org/jfree/chart/demo/CombinedXYPlotDemo1)
+
+
+The compiler uses the current working dir . as the default classpath UNLESS you specify the
+classpath, in which case the current dir is NO LONGER part of the classpath and must be
+added manually.

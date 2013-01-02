@@ -1,0 +1,54 @@
+.menutable {
+	BORDER-RIGHT: #990000 1px dotted; BORDER-TOP: #990000 1px dotted; BORDER-LEFT: #990000 1px dotted
+}
+.menuhead {
+	FONT-SIZE: 80%; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.menuitem {
+	FONT-SIZE: 80%; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.eyecatcher {
+	FONT-SIZE: 80%; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.title {
+	FONT-SIZE: 80%; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.menuhead {
+	VERTICAL-ALIGN: top; BORDER-BOTTOM: #990000 1px dotted
+}
+.menuitem {
+	VERTICAL-ALIGN: top; BORDER-BOTTOM: #990000 1px dotted
+}
+.menuhead {
+	FONT-WEIGHT: bold
+}
+.eyecatcher {
+	VERTICAL-ALIGN: top
+}
+A.menulink {
+	COLOR: #000000; TEXT-DECORATION: none
+}
+A.menulink:hover {
+	COLOR: #0000ff; TEXT-DECORATION: underline
+}
+.title {
+	PADDING-RIGHT: 2px; PADDING-LEFT: 2px; FONT-WEIGHT: bold; PADDING-BOTTOM: 1px; COLOR: #ffffff; PADDING-TOP: 1px; BACKGROUND-COLOR: #990000
+}
+.title A {
+	COLOR: #ffffff
+}
+.title A.menulink:link {
+	COLOR: #ffffff
+}
+.title A.menulink:visited {
+	COLOR: #ffffff
+}
+.title A.menulink:hover {
+	COLOR: #ffffff
+}
+.headersubject {
+	COLOR: #990000
+}
+.headersubject A {
+	COLOR: #990000
+}

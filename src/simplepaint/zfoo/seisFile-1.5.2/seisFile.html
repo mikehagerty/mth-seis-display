@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+   <base href="http://www.seis.sc.edu/" />
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>USC Seismology - SeisFile</title>
+  <link rel="stylesheet" type="text/css" href="styles/seis_website.css"/>
+  <link rel="stylesheet" type="text/css" href="styles/index.css"/>
+   <script type="text/javascript">
+     function decode(domain, user){
+       return("mail"+"to:"+user.replace("*rem*","")+"@"+domain);
+     }
+   </script>
+</head>
+<body>
+	<a id="logo" href="index.html">	
+<img src="images/seislogo.png"/>
+</a>
+        <div id="content">
+			
+
+  <div id="nav">
+  
+   <ul>
+      
+<li><a  href="index.html">Home</a></li>
+
+      
+<li><a  href="people/index.html">People</a></li>
+
+      
+<li><a  href="projects/index.html">Projects</a></li>
+
+    
+<li><a  class="active"  href="software.html">Software</a></li>
+
+    
+<li><a  href="projects/SCSN/index.html">SCSN</a></li>
+
+    
+<li><a  href="k12/index.html">K-12</a></li>
+
+	 
+<li><a  href="contact.html">Contact</a></li>
+
+    </ul>
+
+  </div>
+<div id="text">
+	<p id="breadcrumbs">You are here: <a href="software.html">Software</a> > <b>SeisFile</b></p>
+	<div id="paragraphs">
+               <h1> SeisFile</h1>
+                <p>SeisFile is a library for reading and writing seismic file formats in java. Currently support exists for 
+	SAC, MiniSEED and PSN with limited support for full SEED. Partial support for the IRIS DMC <a href="http://www.iris.edu/ws/station/">Station</a> web service, which returns <a href="http://www.data.scec.org/xml/station">StationXML</a> exists to the resp level. 
+Support for the IRIS DMC <a href="http://www.iris.edu/ws/dataselect/">DataSelect</a>  web service, 
+USGS <a href="http://www.liss.org/">LISS</a>, 
+USGS <a href="ftp://hazards.cr.usgs.gov/CWBQuery">CWB</a> 
+and Geofon <a href="http://geofon.gfz-potsdam.de/geofon//seiscomp/welcome.html">SeedLink</a> protocols are also included. These are low level routines that provide basic connection to the services and basic parsing of the file formats into objects that closely
+	mirror those formats. Hence they are intended to be used as a library rather than an application. The clients, althugh functional, mainly serve as an example of how to connect to these services. Full SEED support was also not intended. However there are cases of <i>almost miniseed</i>, such as one or two control records before the data records. 
+SeisFile can handle the basic structure of these control records, allowing these mixed files to be read without crashing, but not all blockettes are parsed into fields. 
+Support for the many blockette types in full SEED could be added in the future, although there is a large amount of bookkeeping to implement that and seisFile was intended to be small and focused.</p>
+<p>The developer page for seisFile is now hosted at <a href="http://code.google.com/p/seisfile">http://code.google.com/p/seisfile</a>.</p>
+<p>SeisFile is released under the <a href="http://www.gnu.org/licenses/gpl.html">GNU Public License</a>, v3 or later.</p>
+	<br/>
+    <h3>Example Apps</h3>
+    <p>There are several example applications included, showing how to use seisFile in different ways. The clients, located in the bin directory, are:</p>
+    <ol>
+    <li>saclh - prints all the header fields of sac files, see edu/sc/seis/seisFile/sac/ListHeader.java</li>
+    <li>mseedlh - prints the header and blockettes of seed control and data records, see edu/sc/seis/seisFile/mseed/ListHeader.java</li>
+    <li>seedlinkclient - connects to a SeedLink server and retrieves miniseed data from it</li>
+    <li>lissclient - connects to a liss server and retrieves miniseed data from it</li>
+    <li>dswsclient - connects to the IRIS DMC data select web service and retrieves miniseed data from it</li>
+    <li>stationxmlclient - connects to the IRIS DMC station web service and retrieves information about networks, stations and channels from it.</li>
+    <li>cwbclient - connects to the USGS CWB service and retrieves miniseed data from it.</li>
+    </ol>
+    <h3>SAC</h3>
+    <p>SAC supports both reading of binary SAC datafiles, as well as poles and zeros.
+    </p>
+    <p>
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%"><code>SacTimeSeries sac = new SacTimeSeries(filename);
+</code></pre>
+or
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>DataInput dis = ...
+SacTimeSeries sac = new SacTimeSeries(dis)
+</code></pre>
+and reading a polezero file:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>SacPoleZero spz = new SacPoleZero(filename);
+</code></pre>
+    </p>
+    <br/>
+    <h3>SEED and MiniSEED</h3>
+    <p>Miniseed support is good for straight miniseed, ie only binary "data records" and no ascii "control records". It is less complete for the control blockettes in full SEED. SeisFile also does not include routines to decompress seed
+ data, please see <a href="http://www.seis.sc.edu/seedCodec.html">SeedCodec</a>
+for these routines. A miniseed file can be read like this.<p>
+    <pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>DataInput dis = new DataInputStream(new BufferedInputStream(new FileInputStream(filename)));
+PrintWriter out = new PrintWriter(System.out, true);
+try {
+    while (true) {
+        SeedRecord sr = SeedRecord.read(inStream, 4096);
+        // maybe print it out...
+        sr.writeASCII(out);
+        if (sr instanceof DataRecord) {
+            DataRecord dr = (DataRecord)sr;
+            // now do something with the data...
+        }
+    }
+} catch (EOFException e) {
+}
+
+</code></pre>
+                    <br/>
+    <h3>PSN</h3>
+    <p>
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>PSNDataFile psnData = new PSNDataFile(filename);
+</code></pre>
+                    <br/>
+    <h3>SeedLink</h3>
+    <p>
+An example of seedlink support is in
+src/main/java/edu/sc/seis/seisFile/seedlink/Client.java
+which can also be run as a client. For example:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>bin/seedlinkclient -n II -c BHZ  -m 8
+</code></pre>
+will print a summary of 8 packets from the II network and
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>bin/seedlinkclient -n IU -s KONO -c BHZ -o kono.mseed  -m 8
+</code></pre>
+will store the next 8 packets for KONO in a miniseed file.
+</p>
+<p>
+Usage is:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>
+java edu.sc.seis.seisFile.seedlink.Client [-n net][-s sta][-l loc][-c chan][-h host][-p port][-o outfile][-m maxpackets][--verbose][--version][--help]</p>
+</code></pre>
+                    <br/>
+    <h3>DataSelect</h3>
+    <p>
+An example of support for the new IRIS DMC <a href="http://www.iris.edu/ws/dataselect/">dataSelect</a> web service is in
+src/main/java/edu/sc/seis/seisFile/dataSelectWS/Client.java
+which can also be run as a client. For example:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>bin/dswsclient -n IU -s BBSR -l 00 -c BHZ -b 2010-10-01T00:00:00.0 -d 120
+</code></pre>
+downloads 120 seconds of miniseed data for IU.BBSR.00.BHZ.
+<p>
+Usage is:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>
+java edu.sc.seis.seisFile.dataSelectWS.Client [-n net][-s sta][-l loc][-c chan][-b yyyy-MM-ddTHH:mm:ss.SSS][-d seconds][-u url][-o outfile][-m maxpackets][--verbose][--version][--help]
+</code></pre>
+                    <br/>
+    <h3>CWB</h3>
+    <p>
+An example of support for the USGS <a href="ftp://hazards.cr.usgs.gov/CWBQuery">CWB</a> service is in
+src/main/java/edu/sc/seis/seisFile/usgsCWB/Client.java
+which can also be run as a client. For example:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>bin/cwbclient -n US -s DUG -l 00 -c BHZ -b 2010-10-01T00:00:00.0 -d 120
+</code></pre>
+downloads 120 seconds of miniseed data for US.DUG.00.BHZ.
+<p>
+Usage is:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>
+java edu.sc.seis.seisFile.dataSelectWS.Client [-n net][-s sta][-l loc][-c chan][-b yyyy-MM-ddTHH:mm:ss.SSS][-d seconds][-u url][-o outfile][-m maxpackets][--verbose][--version][--help]
+</code></pre>
+                    <br/>
+    <h3>StationXML</h3>
+    <p>
+An example of support for the new IRIS DMC station web service is in
+src/main/java/edu/sc/seis/seisFile/station/StationXMLClient.java
+which can also be run as a client. For example:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>bin/stationxmlclient -u 'http://www.iris.edu/ws/station/query?net=IU&sta=SNZO&chan=BHZ&level=chan'
+StaMessage
+Source: IRIS-DMC
+Sender: IRIS-DMC
+Module: IRIS WEB SERVICE: http://www.iris.edu/ws/station Networks: [IU] Stations: [SNZO] Channels: [BHZ] level:[chan]
+SentDate: 2011-06-03T16:00:41
+Network: IU Global Seismograph Network (GSN - IRIS/USGS) 1988-01-01T00:00:00 2500-12-12T23:59:59
+  Station: IU.SNZO 4
+    Station Epoch: IU.SNZO  1992-04-07T00:00:00 to 1997-11-19T00:00:00
+      Channel Epoch:   .BHZ  1992-04-09T00:00:00 to 1997-11-19T00:00:00
+    Station Epoch: IU.SNZO  1997-11-19T00:00:00 to 2009-09-18T00:00:00
+      Channel Epoch:   .BHZ  1997-11-19T00:00:00 to 1999-02-14T22:00:00
+      Channel Epoch: 00.BHZ  1999-02-14T22:00:00 to 2003-01-28T06:00:00
+      Channel Epoch: 00.BHZ  2003-01-28T06:00:00 to 2009-09-18T00:00:00
+      Channel Epoch: 10.BHZ  1999-02-14T22:10:00 to 2006-01-25T22:00:00
+      Channel Epoch: 10.BHZ  2006-01-25T22:00:00 to 2009-09-18T00:00:00
+    Station Epoch: IU.SNZO  2009-09-18T00:00:00 to 2010-12-10T00:00:00
+      Channel Epoch: 00.BHZ  2009-09-18T00:00:00 to 2010-12-10T00:00:00
+      Channel Epoch: 10.BHZ  2009-09-18T00:00:00 to 2010-12-10T00:00:00
+    Station Epoch: IU.SNZO  2010-12-10T00:00:00 to 2599-12-31T23:59:59
+      Channel Epoch: 00.BHZ  2010-12-10T00:00:00 to 2599-12-31T23:59:59
+      Channel Epoch: 10.BHZ  2010-12-10T00:00:00 to 2599-12-31T23:59:59
+</code></pre>
+ gets the BHZ channels for IU.SNZO.
+</p>
+<p>
+Usage is:
+<pre style="font-family: Andale Mono, Lucida Console, Monaco, fixed, monospace; color: #000000; background-color: #eee;font-size: 12px;border: 1px dashed #999999;line-height: 14px;padding: 5px; overflow: auto; width: 100%">
+<code>
+bin/stationxmlclient -u url
+</code></pre>
+<p>Because the URL will have ampersands and question marks, it might need to be enclosed in single quotes</p>
+                    <br/>
+                    <h3>Download</h3>
+                    <p>The distribution can be downloaded here: 
+<a href="http://www.seis.sc.edu/downloads/seisFile">http://www.seis.sc.edu/downloads/seisFile</a>. Source is included and a precompiled jar file will be in the lib subdirectory.</p>
+<p>seisFile can be recompiled with the <a href="http://www.gradle.org">gradlew</a> script, like
+<code> ./gradlew jar</code>
+which will place a recompiled jar in the build/libs directory. See <a href="http://www.gradle.org">gradle.org</a>
+for more information.</p>
+<p>SeisFile comes with several extra jars in the lib directory. However, these are only used by the XML parsing needed by for stationXML. Applications using only the other file/server types within seisFile do not need to include them.</p> 
+               <p>  If you have any comments, please 
+<a 	href="mail.html" 
+   onmouseover="javascript:this.href=decode('seis.sc.edu', '*rem*crotwell')"
+   onfocus="javascript:this.href=decode('seis.sc.edu', '*rem*crotwell')"
+>email us</a>.</p>
+<p>SeisFile is a product of the University of South Carolina.</p>
+</div>
+	
+	</div>
+<div id="footer">
+<p><a href="http://sc.edu">University of South Carolina</a>, <a href="http://www.geol.sc.edu">Department of Geological Sciences</a>, 
+	701 Sumter Street Columbia, SC 29208 <a id="email" 	href="mail.html" 
+   onmouseover="javascript:this.href=decode('seis.sc.edu', '*rem*www')"
+   onfocus="javascript:this.href=decode('seis.sc.edu', '*rem*www')"
+>
+   Email
+  </a></p>
+
+
+</div>
+		</div>
+        </body>
+    </html>

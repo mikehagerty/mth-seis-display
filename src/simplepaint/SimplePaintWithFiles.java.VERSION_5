@@ -1,0 +1,529 @@
+/* 
+   Ver. 4
+   This works but there is still the issue of: when I read in a file and it repaints(), I
+   want it to set the tic mark on menu item Control->Draw Seis so that it works correctly
+   e.g., to set seis.setSelected(true), but I can't set this from outside of the makeMenuBar.
+
+   The reason the for(CurveData curve : curves) {...} doesn't generate an exception is that you
+   never go in there when curves.size()=0
+
+   Changed makeColorMenuItem to change color of seis - this is a hack since I'm still keeping it
+   general - ie., an array of curves() that must be stepped through (in reality there is only 1 curve)
+
+
+   Ver. 3
+   This version pops open a window with axes drawn, reads in the file (bks_1col.txt)
+   and then: changes the background to blue and plots the seis
+
+   I was wrong about the reasons for the java exception - array out of bounds
+   What seems to be happening is that I am looking at the curves() array before it has
+   any elements (e.g., before the file has been read into it). That's because I'm doing it
+   in the paintComponent() class, which gets run before I read it in. The trick is to check
+   that curves.size() > 0 before I try to do anything with it.
+
+   Ver. 2
+   Edited doOpenAsText to read in single col. doubles (e.g., bks_1col.txt) and plot in seis.draw(g)
+   This works, using an added variable to CurveData = points2D,
+   however, I'm getting array out of bounds exceptions, so in the next version I will remove
+   points2D and move everything to points = doubles
+
+   Ver. 1
+   Works as the original SimplePaintWithFiles - still opens a text ascii file with "coords"
+   I've removed the following routines: doSaveAsText, doSaveAsImage, doOpenAsBinary
+*/
+
+
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import java.awt.geom.*;
+
+public class SimplePaintWithFiles extends JFrame {
+   
+   public static void main(String[] args) {
+      JFrame window = new SimplePaintWithFiles();
+      window.setVisible(true);
+   }
+      
+   public SimplePaintWithFiles() {
+      super("SimplePaint: Untitled");
+      SimplePaintPanel content = new SimplePaintPanel();
+      setContentPane(content);
+      setJMenuBar(content.createMenuBar());
+      pack();
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    //setLocation( (screenSize.width - getWidth())/2 , (screenSize.height - getHeight())/2 );
+      setLocation(50,100);
+      setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+      setResizable(true);  
+   }
+
+   private static class CurveData implements Serializable {
+      Color color;  // The color of the curve.
+      boolean symmetric;  // Are horizontal and vertical reflections also drawn?
+      ArrayList<Point2D.Double> points;  // The points on the curve.
+   }
+   
+   
+   private class SimplePaintPanel extends JPanel {
+
+      private ArrayList<CurveData> curves;  // A list of all curves in the picture.
+
+      private Color currentColor;   // When a curve is created, its color is taken
+      private boolean useSymmetry;  // When a curve is created, its "symmetric"
+      private File editFile;        // The file that is being edited, if any.
+      private JFileChooser fileDialog;   // The dialog box for all open/save commands.
+
+      private int width, height;
+      private Axes axes;
+      private Seis seis;
+      private int xoff, yoff, yctr;
+      private boolean drawAxes;
+      private boolean drawSeis;
+
+      private Timer timer;
+
+
+      public SimplePaintPanel() {
+         curves = new ArrayList<CurveData>();
+         currentColor = Color.BLACK;
+         setBackground(Color.WHITE);
+         setBackground(Color.GREEN);
+         setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+         MouseHandler listener = new MouseHandler();
+         addMouseListener(listener);
+         addMouseMotionListener(listener);
+         setPreferredSize( new Dimension(1200,450) );
+
+// MTH: add timer to JPanel:
+      ActionListener action = new ActionListener() {
+         public void actionPerformed(ActionEvent evt) {
+            repaint();
+         }
+      };
+      timer = new Timer( 1, action );  // Fires every 30 milliseconds.
+
+      } // end SimplePaintPanel() Constructor
+
+
+      private class MouseHandler implements MouseListener, MouseMotionListener {
+         CurveData currentCurve;
+         boolean dragging;
+         public void mousePressed(MouseEvent evt) {
+            if (dragging)
+               return;
+            dragging = true;
+            currentCurve = new CurveData();
+            currentCurve.color = currentColor;
+            currentCurve.symmetric = useSymmetry;
+/* MTH: had to move this over to Point2D.Double for compatibility with doOpenAsText:
+            currentCurve.points = new ArrayList<Point>();
+            currentCurve.points.add( new Point(evt.getX(), evt.getY()) );
+*/
+            currentCurve.points = new ArrayList<Point2D.Double>();
+            currentCurve.points.add( new Point2D.Double(evt.getX(), evt.getY()) );
+            curves.add(currentCurve);
+         }
+         public void mouseDragged(MouseEvent evt) {
+            if (!dragging)
+               return;
+          //currentCurve.points.add( new Point(evt.getX(),evt.getY()) );
+            currentCurve.points.add( new Point2D.Double(evt.getX(),evt.getY()) );
+            repaint();  // redraw panel with newly added point.
+         }
+         public void mouseReleased(MouseEvent evt) {
+            if (!dragging)
+               return;
+            dragging = false;
+            if (currentCurve.points.size() < 2)
+               curves.remove(currentCurve);
+            currentCurve = null;
+         }
+         public void mouseClicked(MouseEvent evt) { }
+         public void mouseEntered(MouseEvent evt) { }
+         public void mouseExited(MouseEvent evt) { }
+         public void mouseMoved(MouseEvent evt) { }
+      } // end nested class MouseHandler
+
+
+      /**
+       * Fills the panel with the current background color and draws all the
+       * curves that have been sketched by the user.
+       */
+      public void paintComponent(Graphics g) {
+
+         xoff   = 10;
+         yoff   = 10;
+         height = getHeight();
+         width  = getWidth();
+         yctr   = height/2;
+// MTH: let's try just defining these once:
+	 if (axes == null) axes = new Axes();
+	 if (seis == null) seis = new Seis();
+
+	 if (!timer.isRunning()) {
+           super.paintComponent(g);
+	   if (drawAxes){
+             axes.draw(g);
+           }
+drawSeis = true;
+	   if (drawSeis){
+             seis.draw(g);
+           }
+         }
+        else {
+	 if (drawSeis){
+           seis.draw(g);
+           seis.iframe++;
+         }
+	 if (seis.iframe == seis.Npts) {
+	  timer.stop();
+	  seis.iframe = 1;;
+	 }
+        } // end timer is running
+
+      } // end paintComponent()
+
+
+      private class Axes {
+        Axes() { // Constructor
+        }
+        void draw(Graphics g) {
+          g.setColor(Color.BLACK);
+          g.drawLine(xoff,yoff,xoff,height-yoff);
+          g.drawLine(xoff,yctr,width -xoff,yctr);
+        }
+      } // end nested class Axes
+
+      private class Seis {
+	int iframe; // Really the frame count
+	int Npts;
+        Seis() { // Constructor
+	  iframe=1;
+        }
+        void draw(Graphics g) {
+         double yscale = height - yoff - yctr; // max value in pixels
+
+         Npts = 1;		// This is called even before the file is read in, when curves.size() = 0
+         if (curves.size() > 0){
+           Npts = (curves.get(0)).points.size();
+         }     
+         //int Npts = 4231;
+         int xmax = width - xoff;
+         double delX = (double)(xmax - xoff) / (double)Npts;
+         double xscale = delX;
+
+//        g.drawString("i=" + i, 600,100);
+
+// Use same loop to plot entire trace at once
+	 int istart = 1;
+	 int iend   = Npts;
+	 if (timer.isRunning()){
+	   istart = iframe; iend = iframe+1;
+         }
+
+         for ( CurveData curve : curves) {
+            g.setColor(curve.color);
+          //for (int i = 1; i < curve.points.size(); i++) {
+            for (int i = istart; i < iend; i++) {
+               // Draw a line segment from point number i-1 to point number i.
+               int x1 = (int) (xscale * (i-1)) + xoff;
+               int x2 = (int) (xscale * (i))   + xoff;
+               int y1 = (int) (yscale * curve.points.get(i-1).y) + yctr;
+               int y2 = (int) (yscale * curve.points.get(i).y)   + yctr;
+               g.drawLine(x1,y1,x2,y2);
+//g.drawString("x2=" + x2 + " y2=" + y2, 900,100);
+               //g.drawRect(x1,y1,5,5);
+            } // end for points
+         } // end for curves
+        } // end Seis.draw()
+       } // end nested class Seis
+
+
+
+      /**
+       * Creates a menu bar for use with this panel.  It contains
+       * four menus: "File, "Control", "Color", and "BackgroundColor".
+       */
+      public JMenuBar createMenuBar() {
+
+         /* Create the menu bar object */
+
+         JMenuBar menuBar = new JMenuBar();
+
+         /* Create the menu bar and add them to the menu bar. */
+
+         JMenu fileMenu = new JMenu("File");
+         JMenu controlMenu = new JMenu("Control");
+         JMenu colorMenu = new JMenu("Color");
+         JMenu bgColorMenu = new JMenu("BackgroundColor");
+         menuBar.add(fileMenu);
+         menuBar.add(controlMenu);
+         menuBar.add(colorMenu);
+         menuBar.add(bgColorMenu);
+         
+         /* Add commands to the "File" menu.  It contains two sets
+          * of Open and Save commands, one for data saved in object
+          * form and one for data saved in text form.  It also contains
+          * a command for saving the user's picture as a PNG file and
+          * a command for quitting the program.
+          */
+         
+         //Removed the following menu items:
+         //JMenuItem newCommand = new JMenuItem("New");
+         //JMenuItem saveText = new JMenuItem("Save (text format)...");
+         //JMenuItem saveObject = new JMenuItem("Save (binary format)...");
+         //JMenuItem openBinary = new JMenuItem("Open (binary format)...");
+         //JMenuItem saveImage = new JMenuItem("Save Image...");
+
+         JMenuItem openText = new JMenuItem("Open (text format)...");
+         fileMenu.add(openText);
+         openText.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               doOpenAsText();
+            }
+         });
+         fileMenu.addSeparator();
+         JMenuItem quitCommand = new JMenuItem("Quit");
+         fileMenu.add(quitCommand);
+         quitCommand.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               System.exit(0);
+            }
+         });
+         
+
+         /* Add commands to the "Control" menu.  It contains an Undo
+          * command that will remove the most recently drawn curve
+          * from the list of curves; a "Clear" command that removes
+          * all the curves that have been drawn; and a "Use Symmetry"
+          * checkbox that determines whether symmetry should be used.
+          */
+
+         JMenuItem undo = new JMenuItem("Undo");
+         controlMenu.add(undo);
+         undo.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               if (curves.size() > 0) {
+                  curves.remove( curves.size() - 1);
+                  repaint();  // Redraw without the curve that has been removed.
+               }
+            }
+         });
+         JMenuItem clear = new JMenuItem("Clear");
+         controlMenu.add(clear);
+         clear.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               //curves = new ArrayList<CurveData>();
+               drawAxes = false;
+               repaint();  // Redraw with no curves shown.
+            }
+         });
+         JCheckBoxMenuItem axe = new JCheckBoxMenuItem("Draw Axes");
+         controlMenu.add(axe);
+//MTH : this doesn't work - I'm trying to get the "Clear" button above to change the Draw Axes to unchecked
+if (!drawAxes){
+               axe.setSelected(false);
+}
+         axe.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               drawAxes  = ((JCheckBoxMenuItem)evt.getSource()).isSelected();
+               repaint();
+            }
+         });
+         JCheckBoxMenuItem seis = new JCheckBoxMenuItem("Draw Seis");
+	 if (drawSeis){ seis.setSelected(true);}
+	 seis.setSelected(true);
+         controlMenu.add(seis);
+         seis.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               drawSeis  = ((JCheckBoxMenuItem)evt.getSource()).isSelected();
+               timer.start();
+               //repaint();
+            }
+         });
+
+         /**
+          * Add commands to the "Color" menu.  The menu contains commands for
+          * setting the current drawing color.  When the user chooses one of these
+          * commands, it has not immediate effect on the drawing.  It justs sets
+          * the color that will be used for future drawing.
+          */
+
+         colorMenu.add(makeColorMenuItem("Black", Color.BLACK));
+         colorMenu.add(makeColorMenuItem("White", Color.WHITE));
+         colorMenu.add(makeColorMenuItem("Red", Color.RED));
+         colorMenu.add(makeColorMenuItem("Green", Color.GREEN));
+         colorMenu.add(makeColorMenuItem("Blue", Color.BLUE));
+         colorMenu.add(makeColorMenuItem("Cyan", Color.CYAN));
+         colorMenu.add(makeColorMenuItem("Magenta", Color.MAGENTA));
+         colorMenu.add(makeColorMenuItem("Yellow", Color.YELLOW));
+         JMenuItem customColor = new JMenuItem("Custom...");
+         colorMenu.add(customColor);
+         customColor.addActionListener( new ActionListener() { 
+            // The "Custom..." color command lets the user select the current
+            // drawing color using a JColorChoice dialog.
+            public void actionPerformed(ActionEvent evt) {
+               Color c = JColorChooser.showDialog(SimplePaintPanel.this,
+                     "Select Drawing Color", currentColor);
+               if (c != null)
+                  currentColor = c;
+            }
+         });
+
+         /**
+          * Add commands to the "BackgourndColor" menu.  The menu contains commands
+          * for setting the background color of the panel.  When the user chooses
+          * one of these commands, the panel is immediately redrawn with the new
+          * background color.  Any curves that have been drawn are still there.
+          */
+
+         bgColorMenu.add(makeBgColorMenuItem("Black", Color.BLACK));
+         bgColorMenu.add(makeBgColorMenuItem("White", Color.WHITE));
+         bgColorMenu.add(makeBgColorMenuItem("Red", Color.RED));
+         bgColorMenu.add(makeBgColorMenuItem("Green", Color.GREEN));
+         bgColorMenu.add(makeBgColorMenuItem("Blue", Color.BLUE));
+         bgColorMenu.add(makeBgColorMenuItem("Cyan", Color.CYAN));
+         bgColorMenu.add(makeBgColorMenuItem("Magenta", Color.MAGENTA));
+         bgColorMenu.add(makeBgColorMenuItem("Yellow", Color.YELLOW));
+         JMenuItem customBgColor = new JMenuItem("Custom...");
+         bgColorMenu.add(customBgColor);
+         customBgColor.addActionListener( new ActionListener() { 
+            public void actionPerformed(ActionEvent evt) {
+               Color c = JColorChooser.showDialog(SimplePaintPanel.this,
+                     "Select Background Color", getBackground());
+               if (c != null)
+                  setBackground(c);
+            }
+         });
+
+         /* Return the menu bar that has been constructed. */
+
+         return menuBar;
+
+      } // end createMenuBar
+
+
+      /**
+       * This utility method is used to create a JMenuItem that sets the
+       * current drawing color.
+       * @param command  the text that will appear in the menu
+       * @param color  the drawing color that is selected by this command.  (Note that
+       *    this parameter is "final" for a technical reason: This is a requirement for
+       *    a local variable that is used in an anonymous inner class.)
+       * @return  the JMenuItem that has been created.
+       */
+      private JMenuItem makeBgColorMenuItem(String command, final Color color) {
+         JMenuItem item = new JMenuItem(command);
+         item.addActionListener( new ActionListener()  {
+            public void actionPerformed(ActionEvent evt) {
+               setBackground(color);
+            }
+         });
+         return item;
+      }
+
+
+      /**
+       * This utility method is used to create a JMenuItem that sets the
+       * background color of the panel.
+       * @param command  the text that will appear in the menu
+       * @param color  the background color that is selected by this command.
+       * @return  the JMenuItem that has been created.
+       */
+      private JMenuItem makeColorMenuItem(String command, final Color color) {
+         JMenuItem item = new JMenuItem(command);
+         item.addActionListener( new ActionListener()  {
+            public void actionPerformed(ActionEvent evt) {
+               currentColor = color;
+       // MTH: this is a hack to change the color of seis().
+               for (CurveData curve : curves) {
+                 curve.color = currentColor;
+               }
+               repaint();
+            }
+         });
+         return item;
+      }
+      
+      
+      private void doOpenAsText() {
+         if (fileDialog == null)
+            fileDialog = new JFileChooser();
+         fileDialog.setDialogTitle("Select File to be Opened");
+         fileDialog.setSelectedFile(null);  // No file is initially selected.
+         int option = fileDialog.showOpenDialog(this);
+         if (option != JFileChooser.APPROVE_OPTION)
+            return;  // User canceled or clicked the dialog's close box.
+         File selectedFile = fileDialog.getSelectedFile();
+         Scanner scanner;
+         try {
+            Reader stream = new BufferedReader(new FileReader(selectedFile));
+            scanner = new Scanner( stream );
+         }
+         catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                  "Sorry, but an error occurred while trying to open the file:\n" + e);
+            return;
+         }
+         try {
+            ArrayList<CurveData> newCurves = new ArrayList<CurveData>();
+            CurveData curve = new CurveData();
+            curve.color = Color.BLACK;
+            curve.symmetric = false;
+            curve.points = new ArrayList<Point2D.Double>();
+            //curve.points2D = new ArrayList<Point2D.Double>();
+            int x = 0;
+            double yy;
+
+            while (scanner.hasNextLine()) {
+               String line = scanner.nextLine();
+               try {
+                 yy = Double.valueOf(line.trim()).doubleValue();
+               }
+               catch (Exception e) {
+                  JOptionPane.showMessageDialog(this,
+                        "Sorry, but an error occurred while trying to convert the line to double:\n" + e);
+                  return;
+               }
+               //curve.points2D.add( new Point2D.Double(x,yy) );
+               curve.points.add( new Point2D.Double(x,yy) );
+
+/* The old way of scanning in ints:
+                  while ( ! itemName.equalsIgnoreCase("endcurve") ) {
+                     else if (itemName.equalsIgnoreCase("coords")) {
+                        int x = scanner.nextInt();
+                        int y = scanner.nextInt();
+                        curve.points.add( new Point(x,y) );
+                     }
+                     else {
+                        throw new Exception("Unknown term in input.");
+                     }
+                     itemName = scanner.next();
+                  }
+*/
+            } // end while
+            newCurves.add(curve);
+            scanner.close();
+            Color newBackgroundColor = Color.BLUE;
+            setBackground(newBackgroundColor);
+            curves = newCurves;
+            //drawSeis = true;
+            //repaint();
+            editFile = selectedFile;
+            setTitle("SimplePaint: " + editFile.getName());
+         } // end try read file
+         catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                  "Sorry, but an error occurred while trying to read the data:\n" + e);
+         }   
+      }// end doOpenAsText
+      
+  } // end SimplePaintPanel = JPanel class
+} // end SimplePaintWithFiles = JFrame class

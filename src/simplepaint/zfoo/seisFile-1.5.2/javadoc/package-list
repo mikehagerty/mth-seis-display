@@ -1,0 +1,12 @@
+edu.sc.seis.seisFile
+edu.sc.seis.seisFile.dataSelectWS
+edu.sc.seis.seisFile.liss
+edu.sc.seis.seisFile.mseed
+edu.sc.seis.seisFile.psn
+edu.sc.seis.seisFile.sac
+edu.sc.seis.seisFile.seedlink
+edu.sc.seis.seisFile.stationxml
+edu.sc.seis.seisFile.syncFile
+edu.sc.seis.seisFile.usgsCWB
+edu.sc.seis.seisFile.waveserver
+edu.sc.seis.seisFile.winston
